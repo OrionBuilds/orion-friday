@@ -1,0 +1,635 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────
+   Agentic OS — Orion slate + cyan design system
+   Tokens, typography, and component primitives per the shared Orion
+   design spec.
+   Rewritten from Midnight Aubergine 2026-07-23 — the CSS-var layer
+   preserves every consumer class name; only values + font stack change.
+   ───────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Slate neutrals (Orion primary) */
+  --bg-deep:    #0f172a;  /* slate-900 — app background */
+  --bg-mid:     #1e293b;  /* slate-800 — sidebar / raised surfaces */
+  --bg-card:    #1e293b;  /* slate-800 — card / panel */
+  --bg-elev:    #334155;  /* slate-700 — input / raised control / hover */
+
+  /* Text ladder (was cream → now slate) */
+  --cream:      #f1f5f9;  /* slate-100 — primary text */
+  --cream-soft: #e2e8f0;  /* slate-200 — soft text */
+  --cream-dim:  #94a3b8;  /* slate-400 — secondary */
+  --cream-mute: #64748b;  /* slate-500 — muted / placeholder */
+
+  /* Cyan brand accent (was gold — same variable names for zero-cost consumer compat) */
+  --gold:       #06b6d4;  /* cyan-500 — primary brand */
+  --gold-soft:  #22d3ee;  /* cyan-400 — soft/accent */
+  --gold-deep:  #0891b2;  /* cyan-600 — deep/hover */
+
+  /* Semantic status colors (kept — Orion uses emerald/amber/red) */
+  --emerald:    #10b981;  /* emerald-500 — success/positive */
+  --emerald-dim:#059669;  /* emerald-600 */
+  --plum:       #ef4444;  /* red-500 — danger (was pink plum) */
+  --rust:       #f59e0b;  /* amber-500 — warning (was warm rust) */
+
+  --line:       rgba(6, 182, 212, 0.20);      /* cyan tint on borders */
+  --line-soft:  rgba(226, 232, 240, 0.08);    /* slate tint */
+  --line-deep:  rgba(226, 232, 240, 0.04);
+
+  --shadow-1: 0 1px 0 rgba(226, 232, 240, 0.03), 0 8px 24px rgba(0,0,0,0.5);
+  --shadow-2: 0 2px 0 rgba(226, 232, 240, 0.04), 0 20px 60px rgba(0,0,0,0.55);
+
+  /* Backwards-compat aliases — existing components reference these. Kept so
+     the token swap cascades without any consumer edits. */
+  --bg: var(--bg-deep);
+  --bg-2: var(--bg-mid);
+  --panel: rgba(30, 41, 59, 0.65);
+  --panel-border: var(--line-soft);
+  --panel-border-hot: var(--line);
+  --fg: var(--cream);
+  --fg-dim: var(--cream-soft);
+  --fg-dimmer: var(--cream-dim);
+
+  --accent-cyan: var(--gold);       /* now literally cyan */
+  --accent-violet: var(--gold);     /* remapped to cyan */
+  --accent-pink: var(--plum);
+  --accent-lime: var(--emerald);
+  --accent-amber: var(--rust);
+  --accent-red: var(--plum);
+
+  --claude: var(--rust);
+  --openclaw: var(--plum);
+  --hermes: var(--gold-soft);
+
+  --grid: rgba(6, 182, 212, 0.04);
+  --glow: 0 0 40px 0;
+}
+
+@theme inline {
+  --color-background: var(--bg-deep);
+  --color-foreground: var(--cream);
+  /* System font stack per Orion — no web font is loaded */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  background: var(--bg-deep);
+  color: var(--cream);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--bg-deep);
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Ambient — a single subtle cyan radial. Paper-grain overlay + warm gold/rust/plum
+   radials removed in the Orion refresh; the spec is flat slate + optional glow. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(1200px circle at 20% 0%, rgba(6, 182, 212, 0.05), transparent 60%);
+}
+
+/* Lift real chrome above the overlay */
+main, header, aside, nav, .surface { position: relative; z-index: 2; }
+
+/* ─────────────────────────────────────────────────────────────────────
+   Typography primitives — Orion system-sans stack, compact SaaS
+   ───────────────────────────────────────────────────────────────────── */
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--cream);
+}
+
+code, pre, kbd, samp, .mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+}
+
+/* Legacy hand-script hooks — used to be Caveat gold. Now plain slate emphasis. */
+.hand,
+.hand-num,
+em.hand,
+[data-hand="true"] {
+  font-style: normal;
+  font-weight: 500;
+  color: var(--cream);
+}
+
+/* In headings, <em> used to become the Caveat hand-script accent. Now plain italic. */
+h1 em, h2 em, h3 em, h4 em, h5 em, h6 em,
+.page-title em, .vital-tile .v em, .status-meta em {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--gold);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Eyebrow — `I. ─── Chapter Label` pattern
+   ───────────────────────────────────────────────────────────────────── */
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 14px;
+  color: var(--cream-dim); margin-bottom: 18px;
+}
+.eyebrow .num {
+  font-weight: 600;
+  font-size: 0.8rem; color: var(--gold); line-height: 0.9;
+}
+.eyebrow .line {
+  width: 32px; height: 1px; background: var(--gold); opacity: 0.6;
+}
+.eyebrow .label {
+  font-weight: 600;
+  font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--cream-dim);
+}
+
+.page-title {
+  font-weight: 600; font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1.1; letter-spacing: -0.02em; color: var(--cream);
+  margin: 0;
+}
+.page-subtitle {
+  font-weight: 400;
+  font-size: 0.875rem; color: var(--cream-dim); margin-top: 12px; line-height: 1.55;
+  max-width: 720px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Status row (`● Active   28 days remaining`)
+   ───────────────────────────────────────────────────────────────────── */
+.status-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-weight: 600;
+  font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--emerald);
+}
+.status-pill::before {
+  content: "●"; color: var(--emerald);
+  text-shadow: 0 0 8px var(--emerald);
+}
+.status-meta {
+  font-weight: 500;
+  font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--cream-dim);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Mission progress bar
+   ───────────────────────────────────────────────────────────────────── */
+.pbar {
+  width: 100%; height: 4px;
+  background: rgba(226, 232, 240, 0.05);
+  border-radius: 999px; overflow: hidden;
+}
+.pbar .fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold-soft));
+  border-radius: 999px;
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
+  transition: width 0.4s ease;
+}
+.pbar-value {
+  font-size: 1.1rem; color: var(--gold); font-weight: 600;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Action cards (Mission Control + most surfaces) — generic .surface-card too
+   ───────────────────────────────────────────────────────────────────── */
+.action-card,
+.surface-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--shadow-1);
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+.action-card:hover,
+.surface-card:hover {
+  border-color: var(--line);
+  background: var(--bg-elev);
+  transform: translateY(-2px);
+}
+.action-card.active {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, rgba(6, 182, 212, 0.04), var(--bg-card));
+}
+
+.action-num {
+  font-weight: 600;
+  font-size: 1.5rem; color: var(--gold); line-height: 0.9;
+}
+.action-tag {
+  font-weight: 700;
+  font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--cream-mute);
+}
+.action-tag.up-next { color: var(--gold); }
+.action-title {
+  font-weight: 600; font-size: 1.05rem;
+  letter-spacing: -0.01em; color: var(--cream);
+}
+.action-desc { color: var(--cream-soft); font-size: 0.875rem; line-height: 1.6; }
+
+/* COPY button — Orion primary gradient */
+.copy-btn {
+  background: linear-gradient(to right, var(--gold), var(--gold-deep));
+  color: white;
+  font-weight: 600; font-size: 0.78rem;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: filter 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.copy-btn:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 8px 24px rgba(6, 182, 212, 0.35);
+  transform: translateY(-1px);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Sidebar
+   ───────────────────────────────────────────────────────────────────── */
+.sidebar-section-label {
+  font-weight: 700;
+  font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--cream-mute);
+}
+.sidebar-item {
+  font-weight: 500; font-size: 0.875rem;
+  color: var(--cream-soft);
+  border-left: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+.sidebar-item:hover { background: rgba(6, 182, 212, 0.06); color: var(--cream); }
+.sidebar-item.active {
+  background: var(--bg-elev);
+  border-left-color: var(--gold);
+  color: var(--cream);
+}
+.sidebar-badge {
+  font-weight: 600;
+  font-size: 0.75rem; color: var(--gold);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Vital tiles (Mission Control row)
+   ───────────────────────────────────────────────────────────────────── */
+.vital-tile {
+  background: var(--bg-card);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 6px;
+  box-shadow: var(--shadow-1);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.vital-tile:hover { border-color: var(--line); transform: translateY(-1px); }
+.vital-tile .k {
+  font-weight: 700;
+  font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--cream-mute);
+}
+.vital-tile .v {
+  font-weight: 600; font-size: 1rem;
+  letter-spacing: -0.01em; color: var(--cream);
+}
+.vital-tile .v em {
+  font-style: italic;
+  color: var(--gold); font-weight: 600;
+}
+.vital-tile .sub {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.7rem;
+  color: var(--cream-dim);
+}
+
+.status-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  display: inline-block;
+}
+.status-dot.ok { background: var(--emerald); box-shadow: 0 0 8px var(--emerald); }
+.status-dot.warn { background: var(--rust); box-shadow: 0 0 8px var(--rust); }
+.status-dot.err { background: var(--plum); box-shadow: 0 0 8px var(--plum); }
+.status-dot.info { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+
+/* ─────────────────────────────────────────────────────────────────────
+   Pull quotes
+   ───────────────────────────────────────────────────────────────────── */
+blockquote {
+  margin: 32px 0; padding: 0 0 0 20px;
+  border-left: 2px solid var(--gold);
+  font-weight: 400; font-size: 1rem;
+  line-height: 1.55; color: var(--cream);
+  letter-spacing: -0.01em;
+}
+blockquote cite {
+  display: block; margin-top: 12px;
+  font-weight: 600;
+  font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--gold); font-style: normal;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   ✦ Section dividers between major page blocks
+   ───────────────────────────────────────────────────────────────────── */
+.divider {
+  display: flex; align-items: center; justify-content: center;
+  margin: 48px 0; gap: 20px;
+}
+.divider .ornament {
+  color: var(--gold); opacity: 0.7;
+  font-size: 1rem;
+}
+.divider .rule { flex: 1; height: 1px; background: var(--line); max-width: 160px; }
+
+/* ─────────────────────────────────────────────────────────────────────
+   Mascot card (Athena/Owl portrait holder)
+   ───────────────────────────────────────────────────────────────────── */
+.mascot-wrap {
+  position: relative;
+  background: radial-gradient(ellipse at center, rgba(6,182,212,0.12), transparent 60%);
+  padding: 8px;
+}
+.mascot-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0; overflow: hidden;
+  box-shadow: var(--shadow-2);
+}
+.mascot-card img { width: 100%; height: auto; display: block; }
+
+/* ─────────────────────────────────────────────────────────────────────
+   Glass `.panel` (reused everywhere) — Orion Card recipe
+   ───────────────────────────────────────────────────────────────────── */
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  position: relative;
+  box-shadow: var(--shadow-1);
+}
+.panel-hot { border-color: var(--line); }
+.panel-hover { transition: border-color .25s ease, transform .25s ease; }
+.panel-hover:hover { border-color: var(--line); transform: translateY(-1px); }
+
+/* ─────────────────────────────────────────────────────────────────────
+   Pills — small status chips (Orion semantic tint convention: bg/10 text)
+   ───────────────────────────────────────────────────────────────────── */
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 11px; border-radius: 999px;
+  font-size: 10.5px; letter-spacing: 0.12em;
+  background: rgba(226,232,240,0.04);
+  border: 1px solid var(--line-soft);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+}
+.pill-ok   { color: var(--emerald);  border-color: rgba(16, 185, 129, 0.30); background: rgba(16, 185, 129, 0.10); }
+.pill-warn { color: var(--rust);     border-color: rgba(245, 158, 11, 0.30); background: rgba(245, 158, 11, 0.10); }
+.pill-err  { color: var(--plum);     border-color: rgba(239, 68, 68, 0.30);  background: rgba(239, 68, 68, 0.10); }
+.pill-info { color: var(--gold);     border-color: rgba(6, 182, 212, 0.30);  background: rgba(6, 182, 212, 0.10); }
+
+/* ─────────────────────────────────────────────────────────────────────
+   Heartbeat dot + metric numerals
+   ───────────────────────────────────────────────────────────────────── */
+.heartbeat {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: currentColor; box-shadow: 0 0 10px currentColor;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.7); opacity: 0.4; }
+}
+
+.metric {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Native <select> dropdowns — the OS-drawn option popup ignores inline
+   styles, so force a readable dark surface + slate text on every option
+   app-wide (fixes near-invisible options in the project/client modals).
+   ───────────────────────────────────────────────────────────────────── */
+select { color: var(--cream); }
+select option,
+select optgroup {
+  background-color: #1e293b; /* --bg-card, literal for the native popup */
+  color: #f1f5f9;            /* --cream */
+}
+select option:checked,
+select option:hover {
+  background-color: #334155; /* --bg-elev */
+  color: #f1f5f9;
+}
+
+/* Minimal scrollbar */
+.scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+.scroll::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.18); border-radius: 4px; }
+.scroll::-webkit-scrollbar-thumb:hover { background: rgba(6, 182, 212, 0.32); }
+.scroll::-webkit-scrollbar-track { background: transparent; }
+
+/* Agent glow utility — keeps existing class names alive (per-agent brand hues
+   preserved: Claude=amber, Openclaw=red, Hermes=cyan-soft). */
+.glow-c { color: var(--rust);     text-shadow: 0 0 18px rgba(245, 158, 11, 0.5); }
+.glow-o { color: var(--plum);     text-shadow: 0 0 18px rgba(239, 68, 68, 0.5); }
+.glow-h { color: var(--gold-soft);text-shadow: 0 0 18px rgba(34, 211, 238, 0.5); }
+
+/* Heading strip used by Panel.tsx header */
+.heading-strip {
+  position: relative;
+  padding-left: 12px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.heading-strip::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 4px; bottom: 4px;
+  width: 2px; border-radius: 2px;
+  background: var(--gold);
+  opacity: 0.85;
+  box-shadow: 0 0 10px var(--gold);
+}
+
+/* Command palette */
+.cmdk-input {
+  background: transparent; outline: none; border: none;
+  width: 100%; padding: 16px 18px; color: var(--cream);
+  font-size: 14px;
+}
+.cmdk-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: 6px;
+  cursor: pointer; color: var(--cream-soft);
+}
+.cmdk-item[data-selected="true"] {
+  background: rgba(6, 182, 212, 0.10);
+  color: var(--cream);
+}
+
+/* Activity stream fade */
+.stream-fade {
+  mask-image: linear-gradient(to bottom, transparent, black 8%, black 92%, transparent);
+}
+
+/* Live tick bars */
+.tick {
+  display: inline-block;
+  width: 4px; height: 12px; margin: 0 1px;
+  background: currentColor; border-radius: 1px;
+  opacity: 0.4;
+}
+.tick.live { animation: tick 1.4s ease-in-out infinite; }
+@keyframes tick {
+  0%, 100% { transform: scaleY(0.4); opacity: 0.4; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+/* Aurora element exists in layout — silence it; the design system uses a
+   subtle ambient gradient on body::after instead */
+.aurora { display: none !important; }
+
+/* Fusion Boardroom — deliberating animations */
+@keyframes fusionShimmer { 0% { transform: translateX(-120%); } 100% { transform: translateX(320%); } }
+.fusion-shimmer { animation: fusionShimmer 1.3s ease-in-out infinite; }
+@keyframes fusionBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+.fusion-caret { animation: fusionBlink 1s step-end infinite; color: #06b6d4; }
+
+/* Hermes / agent chat — render markdown replies tightly inside the bubble
+   (fixes raw ** asterisks, lists, code, headings showing as plain text) */
+.chat-md > :first-child { margin-top: 0; }
+.chat-md > :last-child { margin-bottom: 0; }
+.chat-md p { margin: 0 0 0.5em; }
+.chat-md strong { font-weight: 700; color: var(--fg); }
+.chat-md em { font-style: italic; }
+.chat-md ul, .chat-md ol { margin: 0.3em 0 0.6em; padding-left: 1.25em; }
+.chat-md li { margin: 0.15em 0; }
+.chat-md li > p { margin: 0; }
+.chat-md h1, .chat-md h2, .chat-md h3, .chat-md h4 {
+  font-weight: 700; line-height: 1.25; margin: 0.7em 0 0.35em; color: var(--fg);
+}
+.chat-md h1 { font-size: 1.15em; }
+.chat-md h2 { font-size: 1.1em; }
+.chat-md h3, .chat-md h4 { font-size: 1.02em; }
+.chat-md a { color: var(--gold); text-decoration: underline; }
+.chat-md code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em;
+  background: rgba(255,255,255,0.08); padding: 0.08em 0.36em; border-radius: 5px;
+}
+.chat-md pre {
+  background: rgba(0,0,0,0.35); border: 1px solid var(--panel-border, rgba(255,255,255,0.1));
+  border-radius: 10px; padding: 10px 12px; margin: 0.5em 0; overflow-x: auto;
+}
+.chat-md pre code { background: none; padding: 0; font-size: 0.86em; }
+.chat-md blockquote {
+  border-left: 3px solid var(--panel-border, rgba(255,255,255,0.2));
+  margin: 0.5em 0; padding-left: 0.8em; color: var(--fg-dim);
+}
+.chat-md table { border-collapse: collapse; margin: 0.5em 0; font-size: 0.95em; }
+.chat-md th, .chat-md td { border: 1px solid var(--panel-border, rgba(255,255,255,0.12)); padding: 4px 9px; }
+.chat-md hr { border: 0; border-top: 1px solid var(--panel-border, rgba(255,255,255,0.12)); margin: 0.7em 0; }
+
+/* ─────────────────────────────────────────────────────────────────────
+   Utility primitives — .stack/.row/.muted/.btn* used by pages that were
+   ported from a sibling app (approvals queue is the first: those class
+   names were never carried over here, so the /approvals buttons and
+   layout rendered unstyled on every device and the page effectively
+   didn't work on mobile).
+   ───────────────────────────────────────────────────────────────────── */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+.muted { color: var(--cream-dim); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid var(--line-soft);
+  background: transparent;
+  color: var(--cream);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease, opacity 0.12s ease;
+}
+.btn:hover { border-color: var(--gold); background: var(--bg-elev); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-accent {
+  background: linear-gradient(to right, var(--gold), var(--gold-deep));
+  border-color: transparent;
+  color: white;
+}
+.btn-accent:hover {
+  filter: brightness(1.1);
+  border-color: transparent;
+}
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+
+/* Approvals cards + any /approvals-shaped page need touch-friendly action rows on
+   phones — the two buttons should stack full-width so tap targets are ≥44px. */
+@media (max-width: 640px) {
+  .btn { min-height: 40px; padding: 9px 14px; }
+  .btn-sm { min-height: 36px; padding: 7px 12px; font-size: 12px; }
+  .row { flex-wrap: wrap; }
+  .panel { padding: 14px; }
+  .pill { font-size: 10px; padding: 3px 9px; }
+  .chat-md table { display: block; overflow-x: auto; }
+  .chat-md pre { max-width: 100%; }
+  input[type="text"], input[type="search"], input[type="email"], input[type="url"],
+  input[type="tel"], input[type="number"], input[type="password"], textarea, select {
+    font-size: 16px; /* Below 16px iOS Safari zooms the page on focus. */
+  }
+}
+
+/* Hermes pet — animated petdex sprite that mirrors the agent's live state.
+   6-frame horizontal cycle per state row; row is set inline per state. */
+@keyframes petBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+.hermes-pet {
+  image-rendering: pixelated;
+  pointer-events: none;
+  display: block;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.45));
+  animation: petBob 2.4s ease-in-out infinite;
+}
+.hermes-pet-dock {
+  position: absolute; right: 18px; bottom: 92px; z-index: 5;
+  width: fit-content; height: fit-content;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.hermes-pet-dock .pet-state {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--fg-dim); opacity: 0.75;
+}

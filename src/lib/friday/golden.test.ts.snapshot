@@ -1,0 +1,716 @@
+exports[`friday tool catalog > roster (names, catalog order) 1`] = `
+[
+  "deep_work",
+  "convene_meeting",
+  "run_subagent",
+  "project_status",
+  "list_projects",
+  "site_health",
+  "client_health",
+  "dep_sweep",
+  "dispatch_task",
+  "create_task_from_meeting",
+  "read_deploys",
+  "rollback_deploy",
+  "deploy",
+  "qa_check_deploy",
+  "tail_logs",
+  "error_rate",
+  "weekly_update",
+  "provision_workspace",
+  "create_doc",
+  "share_doc",
+  "unshare_doc",
+  "drive_search",
+  "recent_meetings",
+  "find_contact",
+  "delegate_to_agent",
+  "recall_sessions",
+  "orchestrator_review"
+]
+`;
+
+exports[`tool: client_health > golden surface 1`] = `
+{
+  "name": "client_health",
+  "description": "The per-client health detail — tasks, deliverables, uptime and deploy state for each active client.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "client": {
+        "type": "string",
+        "description": "Filter to one client by name."
+      }
+    }
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "slow"
+}
+`;
+
+exports[`tool: convene_meeting > golden surface 1`] = `
+{
+  "name": "convene_meeting",
+  "description": "Call a meeting with Jordan in the Office War Room — use when something needs live discussion rather than a message: a decision with tradeoffs, a problem spanning agents, or news that warrants talking through. Creates the room with your topic on the record and pings Jordan with the link. Also use when Jordan says 'set up a meeting about X'.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "description": "Short meeting title."
+      },
+      "topic": {
+        "type": "string",
+        "description": "Your opening statement — why you called this and what needs deciding."
+      },
+      "include": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "clara"
+          ]
+        },
+        "description": "Sibling agents who should be in the room too."
+      }
+    },
+    "required": [
+      "title",
+      "topic"
+    ]
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "fast"
+}
+`;
+
+exports[`tool: create_doc > golden surface 1`] = `
+{
+  "name": "create_doc",
+  "description": "Write content into a new Google Doc and return the link — proposals, SOWs, briefs, recaps, meeting notes. Creates a private doc; it does NOT share or send it to anyone.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "description": "Document title."
+      },
+      "content": {
+        "type": "string",
+        "description": "Full body text of the document."
+      }
+    },
+    "required": [
+      "title",
+      "content"
+    ]
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "slow"
+}
+`;
+
+exports[`tool: create_task_from_meeting > golden surface 1`] = `
+{
+  "name": "create_task_from_meeting",
+  "description": "Turn a closed War Room meeting into committed work: reads the archived transcript from the office vault, pulls out the action items assigned to FRIDAY, and files each as a real task. Use after a meeting — 'file my action items from the standup', 'pick up what I owe from that war room' — or when Jordan says items from a meeting should be on the board. Names the meeting loosely (title words or date); no name = the most recent one. Creates internal task rows only — nothing ships, nothing reaches a client.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "meeting": {
+        "type": "string",
+        "description": "Which meeting — title words, slug, or date (e.g. 'war room', '2026-08-13'). Omit for the latest."
+      },
+      "project": {
+        "type": "string",
+        "description": "Project to file the tasks on. Call list_projects if unsure; omit for the active project."
+      }
+    }
+  },
+  "actionClass": "task_dispatch",
+  "reversible": true,
+  "speed": "slow"
+}
+`;
+
+exports[`tool: deep_work > golden surface 1`] = `
+{
+  "name": "deep_work",
+  "description": "THE tool for any request whose answer is a document, audit, plan, or report — if Jordan asks for something that would take a person hours at a desk, this is it. Triggers include: 'I need a technical audit of <system/site>', 'put together an architecture doc/proposal/migration plan', 'build me a report/runbook/spreadsheet', 'research X and write it up', or any ask for 'docs', 'documents', or 'deliverables'. Runs autonomously in the background — researches the subject, builds branded documents (PDF/DOCX/XLSX), files them in the shared drive, and pings Jordan with links plus anything needing their call. Do NOT fall through to the planner for these — it narrates document work without producing files. NOT for quick questions, status reads, or code dispatch (the task/run pipeline owns coding work).",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "task": {
+        "type": "string",
+        "description": "The full work request in Jordan's words, including the target (site/system/client) and the deliverables wanted."
+      },
+      "client": {
+        "type": "string",
+        "description": "Client name, when the work is for a known client."
+      }
+    },
+    "required": [
+      "task"
+    ]
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "slow"
+}
+`;
+
+exports[`tool: delegate_to_agent > golden surface 1`] = `
+{
+  "name": "delegate_to_agent",
+  "description": "Hand a piece of work to CLARA (Jordan's calendar, inbox, contacts, scheduling, personal matters — she is the ONLY agent with that access). Use whenever a request is clearly hers rather than FRIDAY's — e.g. 'schedule a call with the client'. Reports what actually came back, so the handoff is provable.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "agent": {
+        "type": "string",
+        "enum": [
+          "clara"
+        ]
+      },
+      "task": {
+        "type": "string",
+        "description": "The request, in plain words, with enough context to act on."
+      }
+    },
+    "required": [
+      "agent",
+      "task"
+    ]
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "slow"
+}
+`;
+
+exports[`tool: dep_sweep > golden surface 1`] = `
+{
+  "name": "dep_sweep",
+  "description": "Check the client repos for outdated or vulnerable dependencies. Runs in preview mode by default and changes nothing.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "dry_run": {
+        "type": "boolean",
+        "description": "Default true. Preview only."
+      },
+      "max": {
+        "type": "number",
+        "description": "How many repos to check."
+      }
+    }
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "slow"
+}
+`;
+
+exports[`tool: deploy > golden surface 1`] = `
+{
+  "name": "deploy",
+  "description": "Ship a project to production on Netlify. This goes live on the client's site. ALWAYS requires Jordan's explicit approval — never assume it.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "project": {
+        "type": "string",
+        "description": "Project name or id."
+      },
+      "clear_cache": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "project"
+    ]
+  },
+  "actionClass": "deploy",
+  "reversible": false,
+  "speed": "slow"
+}
+`;
+
+exports[`tool: dispatch_task > golden surface 1`] = `
+{
+  "name": "dispatch_task",
+  "description": "Put a new piece of work into the system for an agent to pick up. Use when Jordan describes something they want done rather than asking a question.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string"
+      },
+      "detail": {
+        "type": "string"
+      },
+      "project": {
+        "type": "string",
+        "description": "Project name or id. Call list_projects if unsure."
+      }
+    },
+    "required": [
+      "title"
+    ]
+  },
+  "actionClass": "task_dispatch",
+  "reversible": true,
+  "speed": "fast"
+}
+`;
+
+exports[`tool: drive_search > golden surface 1`] = `
+{
+  "name": "drive_search",
+  "description": "Search Jordan's Google Drive for files and folders — deliverables, briefs, assets, exports. Use for 'find the file about X', 'where is the proposal for Y'. Read-only.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "name_contains": {
+        "type": "string",
+        "description": "Text in the file name."
+      },
+      "max": {
+        "type": "number",
+        "description": "How many files. Default 15."
+      }
+    },
+    "required": [
+      "name_contains"
+    ]
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "slow"
+}
+`;
+
+exports[`tool: error_rate > golden surface 1`] = `
+{
+  "name": "error_rate",
+  "description": "How often FRIDAY's own machinery has been failing: error/warn counts from her event log and per-tool failure rates from telemetry, over a window (default 24h). Use for 'are you healthy', 'anything failing', 'what's your error rate', and as the error-rate step after a deploy. Honest scope: FRIDAY's own logs, NOT client-site errors — those are site_health/read_deploys. Read-only.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "window_hours": {
+        "type": "number",
+        "description": "Look-back window in hours. Default 24, max 336."
+      }
+    }
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "fast"
+}
+`;
+
+exports[`tool: find_contact > golden surface 1`] = `
+{
+  "name": "find_contact",
+  "description": "Look someone up in Jordan's Google Contacts, including people they have only ever emailed. Returns name, email, phone, company. Use for 'what's X's email', 'who is Y', or to fill in a client's details.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Name, email, or company."
+      }
+    },
+    "required": [
+      "query"
+    ]
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "slow"
+}
+`;
+
+exports[`tool: list_projects > golden surface 1`] = `
+{
+  "name": "list_projects",
+  "description": "List projects and their clients. Use to find a project's exact name or id before acting on it.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "search": {
+        "type": "string",
+        "description": "Filter by project or client name."
+      }
+    }
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "fast"
+}
+`;
+
+exports[`tool: orchestrator_review > golden surface 1`] = `
+{
+  "name": "orchestrator_review",
+  "description": "Run the read-only multi-engine review orchestrator against a client project checkout on this machine (Claude code review + test run + git/GitHub check, plus Codex and Antigravity second opinions), or read back the latest report. Use for 'run an orchestrator review on X', 'audit X with all the engines', 'review the FRIDAY repo', 'show me the latest orchestrator report'. Runs in the background (5-10 min) and writes to the orchestrator's reports/<project>/ folder; nothing in the project is modified. NOT for deploying, fixing, or dispatching work — it only reports.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "enum": [
+          "run",
+          "latest"
+        ],
+        "description": "run = start a fresh review; latest = summarize the newest report."
+      },
+      "project": {
+        "type": "string",
+        "description": "Folder under the client-projects root (e.g. FRIDAY, Clients/Globex, GitHub/globex-fl) or a registered project name. Default FRIDAY."
+      }
+    },
+    "required": [
+      "action"
+    ]
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "slow"
+}
+`;
+
+exports[`tool: project_status > golden surface 1`] = `
+{
+  "name": "project_status",
+  "description": "What is happening across the agency right now: active projects, open tasks, running work, and anything awaiting Jordan's approval. Use for 'what's going on', 'where are we', 'status', 'what's in flight'. Pass \`project\` for one project ('how is Globex going?') to get its stage, health, recent activity with provenance, blockers, next steps and anything waiting on Jordan.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "project": {
+        "type": "string",
+        "description": "Project (or client) name or id for a single-project answer. Omit for the agency-wide view."
+      }
+    }
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "fast"
+}
+`;
+
+exports[`tool: provision_workspace > golden surface 1`] = `
+{
+  "name": "provision_workspace",
+  "description": "Create a new GitHub repo and Netlify site for a project. Creates real remote resources, so it needs Jordan's approval.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "Repo/site name, kebab-case."
+      },
+      "private": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "name"
+    ]
+  },
+  "actionClass": "other",
+  "reversible": false,
+  "speed": "slow"
+}
+`;
+
+exports[`tool: qa_check_deploy > golden surface 1`] = `
+{
+  "name": "qa_check_deploy",
+  "description": "Verify a deployed site after (or before) a ship: fetches the production URL plus any per-project QA URLs, checks HTTP status, latency, and expected page content, and reads the TLS certificate's expiry. THE follow-up to deploy and rollback_deploy — 'did the deploy actually work', 'is the site serving right', 'check the cert'. HTTP-level only (no browser), read-only, safe anytime.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "project": {
+        "type": "string",
+        "description": "Project name, id, or a bare domain/URL to check directly."
+      }
+    },
+    "required": [
+      "project"
+    ]
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "slow"
+}
+`;
+
+exports[`tool: read_deploys > golden surface 1`] = `
+{
+  "name": "read_deploys",
+  "description": "Recent Netlify deploys for a project — state, branch, timing, and the error message when one failed. THE read for 'did the deploy go out', 'why did the deploy fail', 'what's live right now'. Read-only, safe anytime.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "project": {
+        "type": "string",
+        "description": "Project name, id, or site/domain."
+      }
+    },
+    "required": [
+      "project"
+    ]
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "fast"
+}
+`;
+
+exports[`tool: recall_sessions > golden surface 1`] = `
+{
+  "name": "recall_sessions",
+  "description": "Search past conversations — full-text over every prior chat session (owner and client channels), months back. Use when a request references something discussed before: 'what did we decide about X', 'didn't we cover this already', 'find that thing the client asked for last month', or when today's ask clearly continues earlier work you don't have in context. Returns matching moments with their session date and topic. Read-only; searches only your own history.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "What to look for — plain keywords work best (e.g. 'staging rollout plan')."
+      },
+      "limit": {
+        "type": "number",
+        "description": "Max matches to return (default 8)."
+      }
+    },
+    "required": [
+      "query"
+    ]
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "fast"
+}
+`;
+
+exports[`tool: recent_meetings > golden surface 1`] = `
+{
+  "name": "recent_meetings",
+  "description": "List recent Google Meet calls with their transcripts — who was on, and what was said. Use for 'what did we agree on the call', 'recap my last meeting with X'.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "days": {
+        "type": "number",
+        "description": "How far back. Default 7."
+      },
+      "max": {
+        "type": "number",
+        "description": "How many meetings. Default 5."
+      }
+    }
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "slow"
+}
+`;
+
+exports[`tool: rollback_deploy > golden surface 1`] = `
+{
+  "name": "rollback_deploy",
+  "description": "Publish a PREVIOUS Netlify deploy again — the undo for a bad production deploy (site serves the old build immediately). Changes what the client's site serves, so it always needs Jordan's approval. Use read_deploys first to pick the deploy id.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "project": {
+        "type": "string",
+        "description": "Project name, id, or site/domain."
+      },
+      "deploy_id": {
+        "type": "string",
+        "description": "The deploy to restore (from read_deploys). Omit to restore the most recent 'ready' deploy before the current one."
+      }
+    },
+    "required": [
+      "project"
+    ]
+  },
+  "actionClass": "deploy",
+  "reversible": false,
+  "speed": "fast"
+}
+`;
+
+exports[`tool: run_subagent > golden surface 1`] = `
+{
+  "name": "run_subagent",
+  "description": "Hand ONE task to a member of your own department and return their report: builder (implementation), qa-e2e (verification/site health), devops-deploy (ships/rollbacks — still gated), reviewer (second opinions), project-manager (status/coordination), client-comms (gated client updates), docs-sop (documentation). Each runs with its own narrow tool set; anything irreversible inside their run still queues for Jordan.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "subagent": {
+        "type": "string",
+        "enum": [
+          "builder",
+          "qa-e2e",
+          "devops-deploy",
+          "reviewer",
+          "project-manager",
+          "client-comms",
+          "docs-sop"
+        ]
+      },
+      "task": {
+        "type": "string",
+        "description": "The single task, fully stated — the specialist sees only this and its own tools."
+      }
+    },
+    "required": [
+      "subagent",
+      "task"
+    ]
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "slow"
+}
+`;
+
+exports[`tool: share_doc > golden surface 1`] = `
+{
+  "name": "share_doc",
+  "description": "Give a named email address access to a Google Doc or Drive file — the doc becomes visible to them the moment this runs. Client-facing, so it ALWAYS queues for Jordan's approval; never assume it went through. Use after create_doc or drive_search when Jordan says to share/send a doc to someone. The undo is unshare_doc.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "doc": {
+        "type": "string",
+        "description": "The doc/file id, or its full Docs/Drive URL."
+      },
+      "email": {
+        "type": "string",
+        "description": "Who gets access. A real address — from find_contact if you only have a name."
+      },
+      "role": {
+        "type": "string",
+        "enum": [
+          "reader",
+          "commenter",
+          "writer"
+        ],
+        "description": "Access level. Default reader."
+      }
+    },
+    "required": [
+      "doc",
+      "email"
+    ]
+  },
+  "actionClass": "client_notify",
+  "reversible": false,
+  "speed": "fast"
+}
+`;
+
+exports[`tool: site_health > golden surface 1`] = `
+{
+  "name": "site_health",
+  "description": "Are the client sites up, and is anything broken? Reads the uptime state and the per-client health report. Use for 'is anything down', 'is anything broken', 'are the sites ok'.",
+  "input_schema": {
+    "type": "object",
+    "properties": {}
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "slow"
+}
+`;
+
+exports[`tool: tail_logs > golden surface 1`] = `
+{
+  "name": "tail_logs",
+  "description": "Read the last N lines of one of FRIDAY's own logs: 'app' (the server's stdout), 'service' (the supervisor loop), 'watchdog', 'backup', 'orchestration' (her event log — runs, approvals, failures), or 'telemetry' (per-tool call records). THE read for 'why did you crash', 'what happened overnight', 'show me the log'. These are FRIDAY's logs, not client-site logs — deploys are read_deploys, sites are site_health. Read-only.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "log": {
+        "type": "string",
+        "enum": [
+          "app",
+          "service",
+          "watchdog",
+          "backup",
+          "orchestration",
+          "telemetry"
+        ],
+        "description": "Which log."
+      },
+      "lines": {
+        "type": "number",
+        "description": "How many lines from the end. Default 40, max 200."
+      }
+    },
+    "required": [
+      "log"
+    ]
+  },
+  "actionClass": "other",
+  "reversible": true,
+  "speed": "fast"
+}
+`;
+
+exports[`tool: unshare_doc > golden surface 1`] = `
+{
+  "name": "unshare_doc",
+  "description": "Take a person's access to a Google Doc or Drive file away again — the undo for share_doc. Use when a doc was shared with the wrong person, the wrong version went out, or access should end. Changes what a client can see, so it queues for Jordan's approval. Note what it can't undo: anything they already read or copied.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "doc": {
+        "type": "string",
+        "description": "The doc/file id, or its full Docs/Drive URL."
+      },
+      "email": {
+        "type": "string",
+        "description": "Whose access to remove."
+      }
+    },
+    "required": [
+      "doc",
+      "email"
+    ]
+  },
+  "actionClass": "client_notify",
+  "reversible": false,
+  "speed": "fast"
+}
+`;
+
+exports[`tool: weekly_update > golden surface 1`] = `
+{
+  "name": "weekly_update",
+  "description": "Send the weekly progress update to clients. This is client-facing — it always needs Jordan's approval.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "client": {
+        "type": "string",
+        "description": "One client, or omit for all due."
+      },
+      "dry_run": {
+        "type": "boolean",
+        "description": "Compose without sending."
+      }
+    }
+  },
+  "actionClass": "weekly_update",
+  "reversible": false,
+  "speed": "slow"
+}
+`;

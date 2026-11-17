@@ -1,0 +1,3 @@
+[mcp_servers.orion]
+url = "http://127.0.0.1:3100/mcp"
+bearer_token_env_var = "ORION_JWT"

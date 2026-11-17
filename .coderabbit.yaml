@@ -1,0 +1,84 @@
+# CodeRabbit config for FRIDAY (Next.js 16 + TypeScript agent-OS).
+#
+# Wave D-1 (2026-07-22, borrowed from coderabbitai/awesome-coderabbit `configs/` templates).
+# Path-scoped review instructions so risk-critical code (engines, browser drivers, WRITE_READY-
+# gated ops, approval-gate + authority policy) gets tighter feedback than generic linting.
+#
+# Install: enable the CodeRabbit GitHub App on this repo; this file is picked up automatically.
+
+language: en-US
+early_access: false
+reviews:
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    drafts: false
+  path_filters:
+    - "!.next/**"
+    - "!node_modules/**"
+    - "!**/*.lock"
+    - "!**/*.log"
+    - "!scripts/*probe*.ts"    # throwaway probes are exempt — deleted before merge
+  path_instructions:
+    # Engine registry + orchestrator — approve/dispatch chain, hottest safety code.
+    - path: "src/lib/friday/engines.ts"
+      instructions: |
+        Engine registry is called from every agent run. Focus review on: (1) any change to the
+        engine interface (`complete`, `completeJSON`) invalidates every caller; (2) new engine
+        additions must handle timeout + retry + JSON-repair the same as existing engines;
+        (3) never `console.log` model output — it may contain PII.
+    - path: "src/lib/friday/orchestrator.ts"
+      instructions: |
+        The dispatch chain. Focus review on: (1) approval status transitions (pending →
+        approved → executing → executed) must go through the CAS path in `store.approvals.update`
+        — never a bare update; (2) `runAgentOnTask` failure modes should NOT leave `approval.status`
+        in "executing" (WAL sweep depends on this); (3) any new `notifyOwner` call must have a
+        `dedupeKey` — otherwise it pages on every retry.
+
+    # Approval-gate + authority policy — flipping a POLICY row changes what auto-approves.
+    - path: "src/lib/friday/risk.ts"
+      instructions: |
+        Approval creator. Focus review on: (1) every new `ApprovalKind` needs a POLICY row in
+        `authority.ts` — a missing row silently defaults to Tier 3 (safe but hides intent);
+        (2) `idempotencyKey` must be set for any approval carrying a `change` (Wave A-1);
+        (3) dedupeKey must be stable across retries.
+    - path: "src/lib/friday/authority.ts"
+      instructions: |
+        Delegated-authority POLICY table. Focus review on: (1) HARD FLOOR rows (`launch`,
+        `enable`, `deploy`, `creative_review`, `welcome_email`, `edit_creative`) must stay
+        3/3/3 across all profiles; (2) new rows lowering tiers require an owner-signed
+        justification in the commit message; (3) `evaluateAuthority` must never mutate.
+
+    # Client-facing surfaces — messaging that reaches real people.
+    - path: "src/lib/friday/clientChannel.ts"
+      instructions: |
+        Client SMS/voice handler. Focus review on: (1) any change to `plan.intent` handling
+        (2026-07-20 client-SMS incident regression risk); (2) `promptInjection.detectPromptInjection` must
+        run BEFORE any LLM call on inbound text; (3) speaker-framed indexMemory must never
+        drop the client-vs-friday framing (recall-poisoning risk).
+    - path: "src/lib/friday/emailAgent.ts"
+      instructions: |
+        Owner + client email routing. Focus review on: (1) `X-Agent` header always set;
+        (2) urgent-subject detection heuristic; (3) never quote-through PII into a subject line.
+
+    # Types + schema
+    - path: "src/lib/friday/types.ts"
+      instructions: |
+        Schema module. Focus review on: (1) every new `BrowserChange.op` needs a downstream
+        Record<op, T> update in preflight, EXEC_TIMEOUT_MS, ZERNIO_WRITE_READY, OP_LEVEL;
+        (2) every new `ApprovalKind` needs an authority POLICY row + `deriveActionClass` case;
+        (3) never remove optional fields — old rows in the JSON store must still deserialise.
+
+    # Prompt-injection defense
+    - path: "src/lib/friday/promptInjection.ts"
+      instructions: |
+        Focus review on: (1) new heuristic patterns should be evaluated for false-positive
+        risk against normal client messages; (2) canary registry values must never appear in
+        source (env-only); (3) hard-suppress mode is opt-in only.
+
+chat:
+  auto_reply: true

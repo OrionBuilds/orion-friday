@@ -1,0 +1,30 @@
+{
+  "$comment": "Copy to ~/.agentic-os/owner-profile.json (or point ORION_OWNER_PROFILE at the file or its directory). Never commit the real one — all values below are deliberately fake.",
+  "identity": {
+    "name": "Jordan Example",
+    "firstName": "Jordan",
+    "workEmail": "jordan@example.com",
+    "excludedAccounts": ["jordan.personal@example.com"],
+    "phone": "+15550100100"
+  },
+  "location": {
+    "homeLat": 0,
+    "homeLng": 0,
+    "timezone": "America/New_York"
+  },
+  "business": {
+    "name": "Acme Co",
+    "domain": "example.com",
+    "infoEmail": "info@example.com"
+  },
+  "drives": {
+    "claraDriveId": "",
+    "fridayDriveId": ""
+  },
+  "vault": {
+    "path": "/path/to/your/vault"
+  },
+  "boundaries": {
+    "personalMailOwner": "clara"
+  }
+}
